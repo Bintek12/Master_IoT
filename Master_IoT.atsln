@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "Master_IoT", "tft2.8_board\Master_IoT.cppproj", "{19118E31-4404-495D-B3E4-45CFE717894F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{19118E31-4404-495D-B3E4-45CFE717894F}.Debug|AVR.ActiveCfg = Debug|AVR
+		{19118E31-4404-495D-B3E4-45CFE717894F}.Debug|AVR.Build.0 = Debug|AVR
+		{19118E31-4404-495D-B3E4-45CFE717894F}.Release|AVR.ActiveCfg = Release|AVR
+		{19118E31-4404-495D-B3E4-45CFE717894F}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
