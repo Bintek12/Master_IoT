@@ -29,18 +29,13 @@ typedef struct
 } m41t00_time_t;
 
 
-// Conversión BCD
-static inline uint8_t decToBcd(uint8_t val) {
-	return ((val / 10) << 4) + (val % 10);
-}
-static inline uint8_t bcdToDec(uint8_t val) {
-	return ((val >> 4) * 10) + (val & 0x0F);
-}
 
 extern UTFT utft;
 extern classAD7843 AD7843;
 
-class classI2C{
+class classI2C
+{
+//variables
 public:
 	m41t00_time_t decoded_time;
 	m41t00_time_t time;

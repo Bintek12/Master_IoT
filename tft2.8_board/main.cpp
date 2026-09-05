@@ -22,7 +22,7 @@
  **********************************************************************************/
 ISR (USARTE0_RXC_vect)
 {
- unsigned char status, sr;
+ unsigned char status,sr;
  sr = SREG;
  status = USARTE0.STATUS; //requerido por el hardware (see Atmel datasheet)
  Usart.rx_buffer[Usart.rx_index] = USARTE0.DATA ;
@@ -64,10 +64,34 @@ ISR(TCD1_OVF_vect)
 ISR(PORTC_INT0_vect)
 {
 	contadores.segundos = 0;
-	//flags.leer_AD7843 = true;
+	flags.leer_AD7843 = true;
 }
 
+/*****************************************************************
+* Control PWM de laS salidaS OUT0, OUT1
+******************************************************************/
+ISR(TCD0_OVF_vect)
+{
+    unsigned char sr;
+    sr = SREG;
+	///Hid.bit_sample = true;
+	if(ciclo)
+	 IGBTA_ON;
+	 else
+	 IGBTB_ON;
+	 ciclo =!ciclo;
+	SREG = sr;
 
+}
+
+ISR(TCD0_CCA_vect)
+{
+	unsigned char sr;
+	sr = SREG;
+	IGBTA_OFF;
+	IGBTB_OFF;
+	SREG = sr;
+}
 
 /*****************************************************************
 * Base de tiempo de 10 ms.
@@ -92,6 +116,46 @@ ISR(PORTC_INT0_vect)
 	PORTB.OUTTGL = OUT2;
  }
  
+ 
+ /***************************************************************
+ * Interrupcion generada por los flanco de subida de la señal
+ * del canal A del Encoder.
+ ***************************************************************/
+ ISR(PORTA_INT0_vect)
+ {
+	 if(PORTA.IN & PIN5_bm)
+	 {
+		 if(PORTA.IN & PIN6_bm)
+		 {
+			 //Menu.direction = false;
+			 //Menu.pulse_counter--;
+		 }
+		 else
+		 {
+			 //Menu.direction = true;
+			 //Menu.pulse_counter++;
+		 }
+		 
+	 }
+	 else
+	 {
+		 if(PORTA.IN & PIN6_bm)
+		 {
+			 //Menu.direction = true;
+			// Menu.pulse_counter++;
+		 }
+		 else
+		 {
+			 //Menu.direction = false;
+			 //Menu.pulse_counter--;
+		 }
+		 
+	 }
+	 
+	 flags.encoder_pulse = true;
+	 
+ }
+
 
 //DMA Chennel Interrupt
 ISR(DMA_CH0_vect)
@@ -105,16 +169,16 @@ ISR(DMA_CH0_vect)
 
 int main(void)
 {
-	clock.system_clocks_init();  //inicializacion del reloj externo 32Mhz del Atxmega32Ua4
+	clock.system_clocks_init();
 	Ports.ports_init();
 	SPIc.spi_init();
 	Usart.usart0_init();
 	Timers.tcd0_init();
-	Timers.tcd1_init();          //comunicacion rs485 (perro guardian)
+	Timers.tcd1_init();//comunicacion rs485 (perro guardian)
 	Timers.tce0_init(1000);
 	adc.adca_init();
 	dac.dacb_init();
-	Rtc.rtc_init();              //inicializacion del RTC
+	Rtc.rtc_init();
 	interrupts_config();
     if(eeprom_read_byte(&eeprom_writed) != 1)
 	   set_defaults();
@@ -136,31 +200,23 @@ int main(void)
     //utft.drawBitmap(0,0,240,50,0,1); //BinteK.raw
 	utft.drawBitmap(0,0,240,320,180224,1); //Solar1.raw
 	page = 0;
-	m41t00.show_time = true;
 	 while(1) {
         if(contadores.led_blinking >14){
 	      contadores.led_blinking = 0;
 	      PORTD.OUTTGL= LED_bm;		  
         } 
-		/*if(PULSADOR_OK)		{
-			while(PULSADOR_OK);
-			//Encoder.push = true;
-			//Mnu.set_time = true;
-			//Mnu.set_time_secuence++;
-		}*/
+		if(contadores.timebase_sg>=50){
+			contadores.timebase_sg = 0;
+            m41t00.time_date_read();
+			V = leer_voltaje(0);
+		    utft.printNumF(V,3,20,250,'.',3,' ');
+		}
 		if(m41t00.show_time){
 			m41t00.time_date_read();
 			Mnu.Display_time();
-			T1 = leer_temperatura(0);
-			Mnu.Display_temp(T1);
+			Ta = leer_temperatura(0);
+			Mnu.Display_temp(Ta);
 		}
-		if(contadores.timebase_sg>=50) {
-			contadores.timebase_sg = 0;
-			
-			//utft.printNumF(T1,2,177,92,'.',3,' ');
-			//Timer.cada_segundo = true;
-		}	
-		
 		if(flags.datos_listos){
 			flags.datos_listos = false;
 			rs485_cmd_decode(Usart.rx_buffer[1]);
@@ -199,9 +255,7 @@ void rs485_cmd_decode(uint8_t cmd){
 			wflash.temp_buffer[i] = Usart.rx_buffer[i+7];	
 		uint32_t target_addr = address + ((uint32_t)page << 8);
 		if (RX_INDEX >= 7 + 256) {
-			char texto[] = "Page";
-			utft.print(texto, 20, 190, 0);
-			//utft.print("Page",20,190,0);
+			utft.print("Page",20,190,0);
 			utft.int_to_bcd(page+1);
 			utft.printChar(utft.digitos.centenas,100,190);
 			utft.printChar(utft.digitos.decenas,120,190);
@@ -235,59 +289,53 @@ void rs485_cmd_decode(uint8_t cmd){
 		break;
 	}
 	case 5:
-	    m41t00.time.sec  = decToBcd(Usart.rx_buffer[2]);
-		m41t00.time.min  = decToBcd(Usart.rx_buffer[3]);
-		m41t00.time.hour    = decToBcd(Usart.rx_buffer[4]);
-		m41t00.time.day_of_week  = decToBcd(Usart.rx_buffer[5]);
-		m41t00.time.day_of_month = decToBcd(Usart.rx_buffer[6]);
-		m41t00.time.month    = decToBcd(Usart.rx_buffer[7]);
-		m41t00.time.year     = decToBcd(Usart.rx_buffer[8]);// 2026 ? 26
-		//classI2C.time.control  = 0x00;          // sin flags
-
-	m41t00.twi_write_rtc(&TWIC);  // ejemplo usando TWIC como bus I2C
-
 	break;
 	case 6:
 	break;
 	case 10:{
 		PORTB.OUTSET = OUT0;
+		utft.print("Salida 1: 1",20,190,0);
 		break;
 	}
 	case 11:{
 		PORTB.OUTCLR = OUT0;
+		utft.print("Salida 1: 0",20,190,0);
 		break;
 	}
 	case 12:{
 		PORTB.OUTSET = OUT1;
+		utft.print("Salida 2: 1",20,190,0);
 		break;
 	}
 	case 13:{
 		PORTB.OUTCLR = OUT1;
+		utft.print("Salida 2: 0",20,190,0);
 		break;
 	}
 	case 14:{
 		PORTB.OUTSET = OUT2;
+		utft.print("Salida 3: 1",20,190,0);
 		break;
 	}
 	case 15:{
 		PORTB.OUTCLR = OUT2;
+		utft.print("Salida 3: 0",20,190,0);
 		break;
 	}
 	case 30:{
-	    //page=(Usart.rx_buffer[3] << 8) | Usart.rx_buffer[2];
-		//utft.print("Salida 3: 0",20,210,0);
-		//utft.int_to_bcd(page);
-		//utft.printChar(utft.digitos.centenas,100,210);
-		//utft.printChar(utft.digitos.decenas,120,210);
-		//utft.printChar(utft.digitos.unidades,140,210);
-		//dac.dacb0_write((Usart.rx_buffer[3] << 8) | Usart.rx_buffer[2]);		
+	    page=(Usart.rx_buffer[3] << 8) | Usart.rx_buffer[2];
+		utft.print("Salida 3: 0",20,210,0);
+		utft.int_to_bcd(page);
+		utft.printChar(utft.digitos.centenas,100,210);
+		utft.printChar(utft.digitos.decenas,120,210);
+		utft.printChar(utft.digitos.unidades,140,210);
+		dac.dacb0_write((Usart.rx_buffer[3] << 8) | Usart.rx_buffer[2]);		
 	break;
 	}
 	}
 }
 
 void set_defaults(void){
-	/*
 	eeprom_write_byte(&prog_eep.periodo,120);
 	eeprom_write_byte(&prog_eep.pulse,20);
 	eeprom_write_byte(&prog_eep.dia_inicio,1);
@@ -295,32 +343,16 @@ void set_defaults(void){
 	eeprom_write_byte(&prog_eep.hora_inicio,8);
 	eeprom_write_byte(&prog_eep.hora_fin,18);
 	eeprom_write_byte(&eeprom_writed,1);
-	*/
 }
-void readParams_from_eep(void)
-{  /*
-	Timer.Event.dia_inicio = eeprom_read_byte(&Event_eep.dia_inicio);
-	Timer.Event.hora_inicio = eeprom_read_byte(&Event_eep.hora_inicio);
-	Timer.Event.minuto_inicio = eeprom_read_byte(&Event_eep.minuto_inicio);
-	Timer.Event.segundo_inicio = eeprom_read_byte(&Event_eep.segundo_inicio);
-	Timer.Event.dia_fin = eeprom_read_byte(&Event_eep.dia_fin);
-	Timer.Event.hora_fin = eeprom_read_byte(&Event_eep.hora_fin);
-	Timer.Event.minuto_fin = eeprom_read_byte(&Event_eep.minuto_fin);
-	Timer.Event.segundo_fin = eeprom_read_byte(&Event_eep.segundo_fin);
-	Timer.Event.enable = (bool) eeprom_read_byte((uint8_t*)&Event_eep.enable);
-	*/
-}
-
 
 void program_load(void){
-	/*
 	prog_ram.periodo = eeprom_read_byte(&prog_eep.periodo);
 	prog_ram.dia_inicio = eeprom_read_byte(&prog_eep.dia_inicio);
 	prog_ram.hora_fin = eeprom_read_byte(&prog_eep.dia_fin);
 	prog_ram.hora_inicio = eeprom_read_byte(&prog_eep.hora_inicio);
 	prog_ram.hora_fin = eeprom_read_byte(&prog_eep.hora_fin);
 	prog_ram.pulse = eeprom_read_byte(&prog_eep.pulse);
-*/
+
 }
 
 //devuelve la temperatura como un entero x 10ºC
@@ -331,9 +363,26 @@ uint16_t leer_temperatura(uint8_t ntc){
 	return round(v);	
 }
 
+//devuelve el voltaje en voltios de una entrada analogica
+float leer_voltaje(uint8_t channel){
+	int16_t itemp = adc.adca_read(channel)- ADC_OFFSET;
+	int32_t temp = fixedpt_fromint(itemp);
+	temp = temp * ADC_REF_FIXED / ADC_TOP_FIXED;
+	V=fixedpt_tofloat(temp);
+	return fixedpt_tofloat(temp);
+
+}
+
+void fillTriangle(uint8_t x,uint8_t y,uint8_t l,uint8_t h){
+	utft.setColor(VGA_WHITE);
+    for(int i=0;i<l;i++){
+		utft.drawVLine(x+i,y,i);
+	}	
+	
+}
 void rs485_tx(){
 	int i;
-	//unsigned int cksum = 0;
+	unsigned int cksum = 0;
 	Usart.tx_buffer[0] = 1;
 	Usart.tx_buffer[1] = x;
 	Usart.tx_buffer[2] = y;

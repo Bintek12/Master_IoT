@@ -141,13 +141,12 @@ void classAD7843::drawKeys(void)
 
 }
 
-//void classAD7843::drawButton(char *string, uint16_t x, uint16_t y, uint8_t ancho, uint8_t alto)
-void classAD7843::drawButton(const char *string, uint16_t x, uint16_t y, uint8_t ancho, uint8_t alto)
+void classAD7843::drawButton(const char * string,uint16_t x, uint16_t y,uint8_t ancho, uint8_t alto)
 {
-	utft.fillRect(x, y, x + ancho, y + alto);
-	utft.print(string, x, y);
+	utft.fillRect(x,y,x+ancho,y+alto);
+	utft.print(string,x,y,0);
+	
 }
-
 
 uint8_t classAD7843::presetKey(void)
 {
@@ -157,7 +156,7 @@ uint8_t classAD7843::presetKey(void)
 		return coll2_decode();
 	if(TCGetX()> 180)
 		return coll3_decode();
-	return 0; // valor por defecto si no se cumple ningún caso 
+	 return 0; // valor por defecto si no se cumple ningún caso
 }
 
 uint8_t classAD7843::coll1_decode(void)
@@ -179,17 +178,17 @@ uint8_t classAD7843::coll1_decode(void)
 uint8_t classAD7843::coll2_decode(void)
 {
 	if(TCGetY()<100)
-		return 2;
+	return 2;
 	
 	if(TCGetY()>100 && TCGetY()< 180)
-		return 5;
+	return 5;
 	
 	if(TCGetY()>180 && TCGetY()< 250)
-		return 8;
+	return 8;
 	
 	if(TCGetY()>250)
-		return 0;
-    return 0; // valor por defecto si no se cumple ningún caso
+	 return 0;
+   return 0; // valor por defecto si no se cumple ningún caso 
 }
 
 uint8_t classAD7843::coll3_decode(void)

@@ -311,7 +311,7 @@ void classW25Qflash::IO_Write_Disable()
 
 uint16_t classW25Qflash::IO_Read_word(unsigned long Dst_Addr)
 {
-	//unsigned long i = 0;
+	unsigned long i = 0;
 	uint8_t bl, bh;
 	chip_select();     /* enable device */
 	IO_Send_Byte(W25P_ReadData);    /* read command */

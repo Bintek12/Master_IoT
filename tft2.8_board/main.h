@@ -31,9 +31,8 @@
 #include "classDAC.h"
 #include "classADC.h"
 #include "classXmegaRtc.h"
-#include "fixedP.h"
 #include "classMnu.h"
-#include "tipos.h"
+#include "fixedP.h"
 //#include "classSSD1306.h"
 
 
@@ -45,8 +44,8 @@
 
 EEMEM uint8_t eeprom_writed;
 
-//EEMEM PROGRAMA prog_eep;
-//PROGRAMA prog_ram;
+EEMEM PROGRAMA prog_eep;
+PROGRAMA prog_ram;
 
 FLAGS flags;
 CONTADORES contadores;
@@ -57,7 +56,6 @@ uint16_t x,y,ancho,alto;
 uint32_t address;
 uint16_t Ta,Tb;
 float V;
-float T1, T2;
 int16_t setpoint;
 bool ciclo;
 
@@ -72,12 +70,9 @@ classXmegaRtc Rtc;
 UTFT utft;
 classAD7843 AD7843;
 classW25Qflash wflash;
-
 classI2C m41t00;
 classMnu Mnu;
 //classSSD1306 Oled96;
-
-
 
 //Prototipos
 void interrupts_config(void);
@@ -86,5 +81,6 @@ void set_defaults(void);
 void program_load(void);
 void rs485_cmd_decode(uint8_t);
 uint16_t leer_temperatura(uint8_t ntc);
-void readParams_from_eep(void);
+float leer_voltaje(uint8_t channel);
+void fillTriangle(uint8_t x,uint8_t y,uint8_t l,uint8_t h);
 #endif /* MAIN_H_ */

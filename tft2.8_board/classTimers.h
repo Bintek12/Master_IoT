@@ -4,17 +4,7 @@
 * Created: 04/02/2015 12:21:25
 * Author: Vaio
 */
-#include <avr/io.h>
-#include <avr/portpins.h>
-#include <avr/eeprom.h>
-#include <stdbool.h>
-#include <math.h>
-#define F_CPU (32000000UL)
-#include <util/delay.h>
-#include "UTFT.h"
-#include "classAD7843.h"
-#include "classI2C.h"
-#include "tipos.h"
+
 
 #ifndef __CLASSTIMERS_H__
 #define __CLASSTIMERS_H__

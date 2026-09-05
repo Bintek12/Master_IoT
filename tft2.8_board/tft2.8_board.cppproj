@@ -210,12 +210,6 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="classMnu.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="classMnu.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="main.cpp">
       <SubType>compile</SubType>
     </Compile>

@@ -128,8 +128,118 @@ uint8_t classI2C::m41t00_byte_to_bcd(uint8_t byte_val)
 
 void classI2C::time_date_read(void)
 {
+	if(set_time)
+	Time_adjust();
+
 	twi_read_rtc(&TWIE);
+	
 }
+
+void classI2C::Time_adjust(void)
+{
+	if(set_minutos && AD7843.TCIsPenOn())
+	minute_adjust();
+	
+	if(set_hora && AD7843.TCIsPenOn())
+	hour_adjust();
+	
+	if(set_dia && AD7843.TCIsPenOn())
+	day_adjust();
+	time_set_timer++;
+	if(time_set_timer>100)
+	{
+		time_set_timer = 0;
+		set_time = false;
+	}
+}
+
+void  classI2C::minute_adjust()
+{
+	set_dia = false;
+	set_hora = false;
+	minutos = m41t00_bcd_to_byte(time.min);
+	minutos++;
+	if(minutos>59)
+	minutos = 0;
+	time.min = m41t00_byte_to_bcd(minutos);
+	twi_write_rtc(&TWIE);
+	time_set_delay_counter = 0;
+	
+}
+
+void  classI2C::hour_adjust()
+{
+	set_minutos = false;
+	set_dia = false;
+	horas = m41t00_bcd_to_byte(time.hour);
+	horas++;
+	if(horas>23)
+	horas = 0;
+	time.hour = m41t00_byte_to_bcd(horas);
+	twi_write_rtc(&TWIE);
+	time_set_delay_counter = 0;
+	
+}
+
+
+void  classI2C::day_adjust()
+{
+	set_hora = false;
+	set_minutos = false;
+	dia = m41t00_bcd_to_byte(time.day_of_week);
+	dia++;
+	if(dia>7)
+	dia = 1;
+	time.day_of_week = m41t00_byte_to_bcd(dia);
+	twi_write_rtc(&TWIE);
+	time_set_delay_counter = 0;
+}
+
+
+void classI2C::setTime_keys(void)
+{
+	if(AD7843.day_key())
+	{
+		set_dia = true;
+		set_minutos = false;
+		set_hora = false;
+		//m41t00.set_time = true;
+		time_set_delay_counter++;
+		if(time_set_delay_counter>9000)
+		set_time = true;
+	}
+	
+	if(AD7843.hours_key())
+	{
+		set_dia = false;
+		set_minutos = false;
+		set_hora = true;
+		//m41t00.set_time = true;
+		time_set_delay_counter++;
+		if(time_set_delay_counter>9000)
+		set_time = true;
+		
+	}
+	
+	if(AD7843.minute_key())
+	{
+		set_dia = false;
+		set_minutos = true;
+		set_hora = false;
+		//m41t00.set_time = true;
+		time_set_delay_counter++;
+		if(time_set_delay_counter>9000)
+		set_time = true;
+		
+	}
+	
+}
+
+
+
+
+
+
 
 // default destructor
 classI2C::~classI2C()

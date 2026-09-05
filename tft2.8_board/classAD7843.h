@@ -71,10 +71,7 @@ protected:
 private:
 	classAD7843( const classAD7843 &c );
 	classAD7843& operator=( const classAD7843 &c );
-	//void drawButton(char *string, uint16_t x, uint16_t y, uint8_t ancho, uint8_t alto);
-	void drawButton(const char *string, uint16_t x, uint16_t y, uint8_t ancho, uint8_t alto);
-
-
+	void drawButton(const char * string,uint16_t x, uint16_t y,uint8_t ancho, uint8_t alto);
 	uint8_t coll1_decode(void);
 	uint8_t coll2_decode(void);
 	uint8_t coll3_decode(void);

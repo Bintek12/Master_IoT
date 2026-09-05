@@ -55,25 +55,24 @@
   };
 
 
-typedef struct
+typedef struct 
 {
-	partNumber pn;       // Identificador del chip
-	uint16_t id;         // Device ID
-	uint32_t bytes;      // Tamaño total en bytes
-	uint32_t pages;      // Número de páginas
-	uint32_t sectors;    // Número de sectores
-	uint32_t blocks;     // Número de bloques
-} pnListType;
+	partNumber pn;
+	uint16_t id;
+	uint32_t bytes;
+	uint32_t pages;
+	uint32_t sectors;
+	uint32_t blocks;
+}pnListType;
 
-static const pnListType pnList[] PROGMEM =
+static const pnListType pnList[] PROGMEM = 
 {
-	{ W25Q80,  0x4014,  1048576,   4096,   256,   16  },  // 1 MB
-	{ W25Q16,  0x4015,  2097152,   8192,   512,   32  },  // 2 MB
-	{ W25Q32,  0x4016,  4194304,  16384,  1024,   64  },  // 4 MB
-	{ W25Q64,  0x4017,  8388608,  32768,  2048,  128  },  // 8 MB
-	{ W25Q128, 0x4018, 16777216,  65536,  4096,  256  }   // 16 MB
+	{ W25Q80, 0x4014,1048576, 4096, 256, 16  },
+	{ W25Q16, 0x4015,2097152, 8192, 512, 32  },
+	{ W25Q32, 0x4016,4194304, 16384,1024,64  },
+	{ W25Q64, 0x4017,8388608, 32768,2048,128 },
+	{ W25Q128,0x4018,16777216,65536,4096,256 }
 };
-
 
 
 extern classSPI SPIc;

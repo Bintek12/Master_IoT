@@ -34,24 +34,24 @@ void classMnu::Display_time(void)
 
 	utft.setColor(VGA_WHITE);
 	utft.setBackColor(VGA_BLUE);
-	utft.setFont(font16x16);
+	utft.setFont(font8x12);
 	char txt;
 	switch(m41t00.decoded_time.day_of_week)
 	{
 		case 1:
-		utft.print("DOMINGO  ",15,60);
+		utft.print("DOMINGO",124,137);
 		break;
 		case 2:
-		utft.print("LUNES    ",15,60);
+		utft.print("LUNES",124,37);
 		break;
 		case 3:
-		utft.print("MARTES   ",15,60);
+		utft.print("MARTES",124,37);
 		break;
 		case 4:
-		utft.print("MIERCOLES",15,60);
+		utft.print("MIERCOLES",124,37);
 		break;
 		case 5:
-		utft.print("JUEVES   ",124,37);
+		utft.print("JUEVES",124,37);
 		break;
 		case 6:
 		utft.print("VIERNES",124,37);
@@ -82,7 +82,7 @@ void classMnu::Display_temp(int16_t temp)
 	float ftemp = (float)temp;
 	//utft.print("Temperatura:",20,240);
 	//utft.printNumF(ftemp,175,74,270,'.',0);   // esquina inferior
-	utft.printNumF(ftemp,2,126,57,'.',0);  // esquina superior
+	utft.printNumF(ftemp,1,126,57,'.',0);  // esquina superior
 	//utft.print("oC",150,270);
 
 }

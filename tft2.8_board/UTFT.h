@@ -59,7 +59,6 @@
 #define F_CPU (32000000UL)
 #include <util/delay.h>
 #include "fonts.h"
-#include "tipos.h"
 
 //#define OUT0        PIN0_bm           //PORTB
 

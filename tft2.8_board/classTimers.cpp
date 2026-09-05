@@ -35,7 +35,7 @@ void classTimers::tc1_disable(TC1_t *ptc)
 //Control PWM asociado al Pid
 void classTimers::tcd0_init(void)
 {
-	//unsigned char s;
+	unsigned char s;
 
 	// Note: the correct PORTD direction for the Compare Channels outputs
 	// is configured in the ports_init function

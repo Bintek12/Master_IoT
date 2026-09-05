@@ -461,7 +461,7 @@ void UTFT::fillScr(uint8_t r, uint8_t g, uint8_t b)
 void UTFT::fillScr(uint16_t color)
 {
 	char ch, cl;
-	unsigned int i,j;
+	unsigned i,j;
 	ch=uint8_t(color>>8);
 	cl=uint8_t(color & 0xFF);
 
@@ -800,7 +800,7 @@ void UTFT::rotateChar(uint8_t c, int x, int y, int pos, int deg)
 	clrXY();
 }
 
-void UTFT::print(const char *st, uint16_t x, uint16_t y,int deg)
+void UTFT::print(const char *st, uint16_t x, uint16_t y, int deg)
 {
 	int stl, i;
 	stl = strlen(st);
@@ -914,7 +914,7 @@ void UTFT::printNumF(double num, uint8_t dec, int x, int y, char divider, int le
 
 	if (divider != '.')
 	{
-		for (unsigned int i=0; i<sizeof(st); i++)
+		for (int i=0; i<sizeof(st); i++)
 			if (st[i]=='.')
 				st[i]=divider;
 	}
@@ -924,13 +924,13 @@ void UTFT::printNumF(double num, uint8_t dec, int x, int y, char divider, int le
 		if (neg)
 		{
 			st[0]='-';
-			for (unsigned int i=1; i<sizeof(st); i++)
+			for (int i=1; i<sizeof(st); i++)
 				if ((st[i]==' ') || (st[i]=='-'))
 					st[i]=filler;
 		}
 		else
 		{
-			for (unsigned int i=0; i<sizeof(st); i++)
+			for (int i=0; i<sizeof(st); i++)
 				if (st[i]==' ')
 					st[i]=filler;
 		}
@@ -1000,7 +1000,7 @@ uint8_t UTFT::getFontYsize()
 void UTFT::drawBitmap(int x, int y, int sx, int sy,uint32_t p, int scale)
 {
 	unsigned int col;
-	int tx, ty,tsx, tsy;
+	int tx, ty, tc, tsx, tsy;
     uint32_t pointer=0;
 	if (scale==1)
 	{
