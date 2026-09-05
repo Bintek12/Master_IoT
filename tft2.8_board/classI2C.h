@@ -13,7 +13,8 @@
 #include <avr/io.h>
 #include "UTFT.h"
 #include "classAD7843.h"
-#define RTC_SLAVE_ADDRESS           0xD0; // already shifted !!!!
+#define RTC_SLAVE_ADDRESS           0xD0 // already shifted !!!!
+
 
 /// Structure to store time and date
 typedef struct
@@ -28,6 +29,13 @@ typedef struct
 	uint8_t creg;
 } m41t00_time_t;
 
+// Conversión BCD
+static inline uint8_t decToBcd(uint8_t val) {
+	return ((val / 10) << 4) + (val % 10);
+}
+static inline uint8_t bcdToDec(uint8_t val) {
+	return ((val >> 4) * 10) + (val & 0x0F);
+}
 
 
 extern UTFT utft;
@@ -57,6 +65,7 @@ private:
 public:
 	classI2C();
 	void twi_init(TWI_t * twiname,long F_syst,long F_i2c);
+	void act(uint8_t dia, uint8_t mes, uint8_t anio,uint8_t hora, uint8_t minuto, uint8_t segundo,uint8_t diaSemana);
 	void twi_write_byte(TWI_t *twiname,uint8_t i2c_address, uint8_t byte);
 	uint8_t twi_read_byte(TWI_t *twiname, uint8_t i2c_address);
 	void twi_write_rtc(TWI_t *twiname);

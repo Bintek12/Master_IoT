@@ -60,22 +60,67 @@ uint8_t classI2C::twi_read_byte(TWI_t *twiname, uint8_t i2c_address)
 /****************************************************/
 void classI2C::twi_write_rtc(TWI_t *twiname)
 {
-
 	uint8_t i;
-	uint8_t *writeData;
-	writeData =(unsigned char *) &time;
-	twiname->MASTER.CTRLC = 0;
-	twiname->MASTER.ADDR = RTC_SLAVE_ADDRESS;  // write to RTC
-	while(!(twiname->MASTER.STATUS&TWI_MASTER_WIF_bm));
-	twiname->MASTER.DATA = 0x00;       // write word addr
-	while(!(twiname->MASTER.STATUS&TWI_MASTER_WIF_bm));
-	for(i=0;i<8;i++)
-	{                  // write date and time
-		twiname->MASTER.DATA =*writeData++;
-		while(!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm));
-	}
-    twiname->MASTER.CTRLC = 0x07;
+	uint8_t *writeData = (uint8_t*)&time;
 
+	// Iniciar transacción: dirección del esclavo + bit de escritura (0)
+	twiname->MASTER.ADDR = (RTC_SLAVE_ADDRESS << 1) | 0;
+
+	// Esperar a que se complete la transmisión de la dirección
+	while (!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm)) {
+		if (twiname->MASTER.STATUS & TWI_MASTER_RXACK_bm) {
+			// El esclavo no respondió ? abortar
+			twiname->MASTER.CTRLC = TWI_MASTER_CMD_STOP_gc;
+			return;
+		}
+	}
+
+	// Enviar dirección inicial de registro (0x00)
+	twiname->MASTER.DATA = 0x00;
+	while (!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm));
+
+	// Escribir los 8 bytes de la estructura time
+	for (i = 0; i < 8; i++) {
+		twiname->MASTER.DATA = *writeData++;
+		while (!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm));
+	}
+
+	// STOP para finalizar la transacción
+	twiname->MASTER.CTRLC = TWI_MASTER_CMD_STOP_gc;
+}
+
+// Formato: act(dia, mes, año, hora, minuto, segundo, diaSemana)
+void classI2C::act(uint8_t dia, uint8_t mes, uint8_t anio,
+uint8_t hora, uint8_t minuto, uint8_t segundo,
+uint8_t diaSemana)
+{
+	uint8_t buffer[8];
+
+	buffer[0] = decToBcd(segundo);
+	buffer[1] = decToBcd(minuto);
+	buffer[2] = decToBcd(hora);
+	buffer[3] = decToBcd(diaSemana);
+	buffer[4] = decToBcd(dia);
+	buffer[5] = decToBcd(mes);
+	buffer[6] = decToBcd(anio);
+	buffer[7] = 0x00; // control sin flags
+
+	// Iniciar transacción con dirección 0xD0 (escritura)
+	twiname->MASTER.ADDR = RTC_SLAVE_ADDRESS; // ya definido como 0xD0
+	while (!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm));
+
+	// Dirección inicial de registro
+	twiname->MASTER.DATA = 0x00;
+	while (!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm));
+
+	// Escribir los 8 bytes
+	for (uint8_t i = 0; i < 8; i++) {
+		twiname->MASTER.DATA = buffer[i];
+		while (!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm));
+	}
+
+	// STOP
+	twiname->MASTER.CTRLC = TWI_MASTER_CMD_STOP_gc;
 }
 
 /****************************************************/

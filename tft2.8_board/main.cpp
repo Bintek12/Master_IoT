@@ -199,6 +199,9 @@ int main(void)
 	//utft.fillRoundRect(0,60,240,180);
     //utft.drawBitmap(0,0,240,50,0,1); //BinteK.raw
 	utft.drawBitmap(0,0,240,320,180224,1); //Solar1.raw
+	// Actualizar a 05/09/26 – 02:36:00, sábado
+	m41t00.act(5, 9, 26, 2, 36, 0, 6);
+
 	page = 0;
 	 while(1) {
         if(contadores.led_blinking >14){
@@ -207,9 +210,7 @@ int main(void)
         } 
 		if(contadores.timebase_sg>=50){
 			contadores.timebase_sg = 0;
-            m41t00.time_date_read();
-			V = leer_voltaje(0);
-		    utft.printNumF(V,3,20,250,'.',3,' ');
+            
 		}
 		if(m41t00.show_time){
 			m41t00.time_date_read();
@@ -289,6 +290,17 @@ void rs485_cmd_decode(uint8_t cmd){
 		break;
 	}
 	case 5:
+	    utft.print("Actualizada la Hora",10,200);
+		m41t00.time.sec  = decToBcd(Usart.rx_buffer[2]);
+	    m41t00.time.min  = decToBcd(Usart.rx_buffer[3]);
+	    m41t00.time.hour    = decToBcd(Usart.rx_buffer[4]);
+	    m41t00.time.day_of_week  = decToBcd(Usart.rx_buffer[5]);
+	    m41t00.time.day_of_month = decToBcd(Usart.rx_buffer[6]);
+	    m41t00.time.month    = decToBcd(Usart.rx_buffer[7]);
+	    m41t00.time.year     = decToBcd(Usart.rx_buffer[8]);// 2026 ? 26
+	    //classI2C.time.control  = 0x00;          // sin flags
+	    m41t00.twi_write_rtc(&TWIC);  // ejemplo usando TWIC como bus I2C
+	    utft.print("FIN",10,210);
 	break;
 	case 6:
 	break;
