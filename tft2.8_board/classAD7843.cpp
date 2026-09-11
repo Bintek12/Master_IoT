@@ -106,19 +106,33 @@ bool classAD7843::day_key(void)
 	return (TCGetY()>0 && TCGetY()<50) ? true:false;
 }
 
-bool classAD7843::hours_key(void)
+bool classAD7843::Boton_agua(void)
 {
-	if(TCGetX()>0 && TCGetX()<100)
-	  if(TCGetY()>55 && TCGetY()<100)
+	if(TCGetX()>0 && TCGetX()<240)
+	  if(TCGetY()>10 && TCGetY()<71)
 	    return true;
 	return false;	
 }
 
-bool classAD7843::minute_key(void)
+bool classAD7843::Boton_energia(void)
 {
-	if(TCGetX()>100 && TCGetX()<220)
-	if(TCGetY()>55 && TCGetY()<100)
-	  return true;
+	if(TCGetX()>0 && TCGetX()<240)
+		if(TCGetY()>85 && TCGetY()<141)
+			 return true;
+	return false;
+}
+bool classAD7843::Boton_menu(void)
+{
+	if(TCGetX()>0 && TCGetX()<20)
+		if(TCGetY()>310 && TCGetY()<320)
+			return true;
+	return false;
+}
+bool classAD7843::Boton_reloj(void)
+{
+	if(TCGetX()>0 && TCGetX()<240)
+		if(TCGetY()>160 && TCGetY()<310)
+			return true;
 	return false;
 }
 

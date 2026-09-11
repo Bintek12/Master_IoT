@@ -89,41 +89,6 @@ void classI2C::twi_write_rtc(TWI_t *twiname)
 	twiname->MASTER.CTRLC = TWI_MASTER_CMD_STOP_gc;
 }
 
-// Formato: act(dia, mes, año, hora, minuto, segundo, diaSemana)
-void classI2C::act(uint8_t dia, uint8_t mes, uint8_t anio,
-uint8_t hora, uint8_t minuto, uint8_t segundo,
-uint8_t diaSemana)
-{
-	uint8_t buffer[8];
-
-	buffer[0] = decToBcd(segundo);
-	buffer[1] = decToBcd(minuto);
-	buffer[2] = decToBcd(hora);
-	buffer[3] = decToBcd(diaSemana);
-	buffer[4] = decToBcd(dia);
-	buffer[5] = decToBcd(mes);
-	buffer[6] = decToBcd(anio);
-	buffer[7] = 0x00; // control sin flags
-
-	// Iniciar transacción con dirección 0xD0 (escritura)
-	twiname->MASTER.ADDR = RTC_SLAVE_ADDRESS; // ya definido como 0xD0
-	while (!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm));
-
-	// Dirección inicial de registro
-	twiname->MASTER.DATA = 0x00;
-	while (!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm));
-
-	// Escribir los 8 bytes
-	for (uint8_t i = 0; i < 8; i++) {
-		twiname->MASTER.DATA = buffer[i];
-		while (!(twiname->MASTER.STATUS & TWI_MASTER_WIF_bm));
-	}
-
-	// STOP
-	twiname->MASTER.CTRLC = TWI_MASTER_CMD_STOP_gc;
-}
-
-/****************************************************/
 
 void classI2C::twi_read_rtc(TWI_t *twiname)
 {
@@ -253,37 +218,7 @@ void classI2C::setTime_keys(void)
 		if(time_set_delay_counter>9000)
 		set_time = true;
 	}
-	
-	if(AD7843.hours_key())
-	{
-		set_dia = false;
-		set_minutos = false;
-		set_hora = true;
-		//m41t00.set_time = true;
-		time_set_delay_counter++;
-		if(time_set_delay_counter>9000)
-		set_time = true;
-		
-	}
-	
-	if(AD7843.minute_key())
-	{
-		set_dia = false;
-		set_minutos = true;
-		set_hora = false;
-		//m41t00.set_time = true;
-		time_set_delay_counter++;
-		if(time_set_delay_counter>9000)
-		set_time = true;
-		
-	}
-	
 }
-
-
-
-
-
 
 
 // default destructor

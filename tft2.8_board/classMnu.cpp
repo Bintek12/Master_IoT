@@ -32,44 +32,45 @@ void classMnu::Display_time(void)
 	unidades_h = utft.digitos.unidades;
 	decenas_h = utft.digitos.decenas;
 
-	utft.setColor(VGA_WHITE);
-	utft.setBackColor(VGA_BLUE);
-	utft.setFont(font8x12);
+	//utft.setColor(VGA_WHITE);
+	//utft.setBackColor(VGA_BLUE);
+	//utft.setFont(font8x12);
+	utft.setColor(VGA_YELLOW);
+	utft.setBackColor(VGA_BLACK);
+	utft.setFont(font16x16);
 	char txt;
 	switch(m41t00.decoded_time.day_of_week)
 	{
 		case 1:
-		utft.print("DOMINGO",124,137);
+		utft.print("DOMI",34,212);
 		break;
 		case 2:
-		utft.print("LUNES",124,37);
+		utft.print("LUNE",34,212);
 		break;
 		case 3:
-		utft.print("MARTES",124,37);
+		utft.print("MART",34,212);
 		break;
 		case 4:
-		utft.print("MIERCOLES",124,37);
+		utft.print("MIERC",34,212);
 		break;
 		case 5:
-		utft.print("JUEVES",124,37);
+		utft.print("JUEV",34,212);
 		break;
 		case 6:
-		utft.print("VIERNES",124,37);
+		utft.print("VIER",34,212);
 		break;
 		case 7:
-		utft.print("SABADO",124,37);
+		utft.print("SABA",34,212);
 		break;
 		default:
-		utft.print("UNKNOWN  ",15,60);
+		utft.print("UNKNOWN  ",34,212);
 		break;		
 	}
-	utft.setFont(font8x12);
-	utft.printChar(decenas_h,47,37);
-	utft.printChar(unidades_h,56,37);
-	
-	utft.setFont(font8x12);
-	utft.printChar(decenas_m,68,37);
-	utft.printChar(unidades_m,78,37);
+	utft.printChar(decenas_h,135,212);
+	utft.printChar(unidades_h,149,212);
+	utft.print(":",161,212);
+	utft.printChar(decenas_m,173,212);
+	utft.printChar(unidades_m,187,212);
 }
 
 
@@ -82,8 +83,8 @@ void classMnu::Display_temp(int16_t temp)
 	float ftemp = (float)temp;
 	//utft.print("Temperatura:",20,240);
 	//utft.printNumF(ftemp,175,74,270,'.',0);   // esquina inferior
-	utft.printNumF(ftemp,1,126,57,'.',0);  // esquina superior
-	//utft.print("oC",150,270);
+	utft.printNumF(ftemp,1,90,250,'.',0);  // esquina superior
+	
 
 }
 

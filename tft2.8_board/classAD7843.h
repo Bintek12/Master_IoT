@@ -23,6 +23,9 @@
 #define TP_SDO           PIN5_bm           //PORTD
 #define TP_CLK           PIN7_bm           //PORTD
 
+#define MENU_PIN  7     // PA7
+
+
 #define TP_CS_LOW()      PORTD.OUTCLR = TP_CS;
 #define TP_CS_HIGH()     PORTD.OUTSET = TP_CS;
 
@@ -62,8 +65,10 @@ public:
 	unsigned char TCIsPenOn(void); //TC_PEN_PIN is 0 when the screen is pressed
 	int16_t ad7843_read(uint8_t);
 	bool day_key(void);
-	bool hours_key(void);
-	bool minute_key(void);
+	bool Boton_agua(void);
+	bool Boton_energia(void);
+	bool Boton_menu(void);
+	bool Boton_reloj(void);
 	void drawKeys(void);
     uint8_t presetKey(void);
 	~classAD7843();

@@ -165,7 +165,12 @@ ISR(DMA_CH0_vect)
 	DMA.CH0.CTRLA|=0x80;
 }
 
-
+void Show_menu(void){
+	utft.clrScr();
+	utft.drawBitmap(0,10,241,61,491520,1); //Boton_agua.raw
+	utft.drawBitmap(0,85,241,61,524288,1); //Boton_energia.raw
+	utft.drawBitmap(0,160,240,150,1032192,1); //Reloj.raw
+}
 
 int main(void)
 {
@@ -186,9 +191,9 @@ int main(void)
 	utft.disp_x_size = 240;
 	utft.disp_y_size = 320;
 	utft.InitLCD(PORTRAIT);
-	utft.setColor(VGA_WHITE);
-	utft.setBackColor(VGA_BLACK);
-    utft.setFont(font16x16);
+	//utft.setColor(VGA_WHITE);
+	//utft.setBackColor(VGA_BLACK);
+    //utft.setFont(font16x16);
 	utft.clrScr();
 	m41t00.twi_init(&TWIE,32000000L,100000L);
     m41t00.show_time = true;
@@ -198,10 +203,19 @@ int main(void)
 	//utft.setColor(VGA_BLUE);
 	//utft.fillRoundRect(0,60,240,180);
     //utft.drawBitmap(0,0,240,50,0,1); //BinteK.raw
-	utft.drawBitmap(0,0,240,320,180224,1); //Solar1.raw
-	// Actualizar a 05/09/26 – 02:36:00, sábado
-	m41t00.act(5, 9, 26, 2, 36, 0, 6);
-
+	Show_menu();
+	
+	m41t00.time.sec  = 00;//decToBcd(Usart.rx_buffer[2]);
+	m41t00.time.min  = 27;//decToBcd(Usart.rx_buffer[3]);
+	m41t00.time.hour    = 23;//decToBcd(Usart.rx_buffer[4]);
+	m41t00.time.day_of_week  = 5;//decToBcd(Usart.rx_buffer[5]);
+	m41t00.time.day_of_month = 9;//decToBcd(Usart.rx_buffer[6]);
+	m41t00.time.month    = 9;//decToBcd(Usart.rx_buffer[7]);
+	m41t00.time.year     = 26;//decToBcd(Usart.rx_buffer[8]);// 2026 ? 26
+	//classI2C.time.control  = 0x00;          // sin flags
+	//m41t00.twi_write_rtc(&TWIC);  // ejemplo usando TWIC como bus I2C
+	m41t00.twi_write_rtc(&TWIE);
+	
 	page = 0;
 	 while(1) {
         if(contadores.led_blinking >14){
@@ -209,8 +223,7 @@ int main(void)
 	      PORTD.OUTTGL= LED_bm;		  
         } 
 		if(contadores.timebase_sg>=50){
-			contadores.timebase_sg = 0;
-            
+			contadores.timebase_sg = 0;         
 		}
 		if(m41t00.show_time){
 			m41t00.time_date_read();
@@ -222,9 +235,23 @@ int main(void)
 			flags.datos_listos = false;
 			rs485_cmd_decode(Usart.rx_buffer[1]);
 		}
-		
-		///Hid.Loop();
-		//Menu.Loop();
+		if (AD7843.Boton_agua()) {
+			utft.clrScr();
+			utft.drawBitmap(0,0,240,320,335872,1); //Turbina1.raw
+			//utft.drawBitmap(0,0,240,320,557056,1); //ClearNegro.raw
+			m41t00.show_time = false;
+		}
+		if (AD7843.Boton_energia()) {
+			utft.clrScr();
+			utft.drawBitmap(0,0,240,320,180224,1); //Solar1.raw
+			//utft.drawBitmap(0,0,240,320,557056,1); //ClearNegro.raw
+			m41t00.show_time = false;
+		}
+
+		if (PULSADOR_OK){
+			Show_menu();
+			m41t00.show_time = true;
+		}
 		
 	}
 }
